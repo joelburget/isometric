@@ -187,7 +187,7 @@ export abstract class IsometricGraphicAbstract extends IsometricElementAbstract 
         });
 
         this.updateSubClassAnimations();
-        if (this.updateAnimations2) this.updateAnimations2();
+        this.updateAnimations2();
 
     }
 

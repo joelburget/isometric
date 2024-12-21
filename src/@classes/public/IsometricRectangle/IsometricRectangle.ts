@@ -90,8 +90,6 @@ export class IsometricRectangle extends IsometricShapeAbstract {
     }
 
     protected updateSubClassAnimations(): void {
-        debugger;
-
         this.animations.forEach((animation: SVGAnimationObject): void => {
             const isNativeSVGProperty = isSVGProperty(animation.property);
 
@@ -186,6 +184,9 @@ export class IsometricRectangle extends IsometricShapeAbstract {
     }
 
     protected updateAnimations2(): void {
+        if (!this._animInfo) {
+            return;
+        }
         const { dims, duration } = this._animInfo;
 
         const element: SVGAnimateElement = document.createElementNS(
