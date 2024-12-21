@@ -135,6 +135,7 @@ export abstract class IsometricGraphicAbstract extends IsometricElementAbstract 
     protected pattern: SVGPatternElement;
     protected animations: SVGAnimationObject[];
     protected abstract updateSubClassAnimations(): void;
+    protected abstract updateAnimations2(): void;
 
     protected addAnimationBasicProperties(attributeName: string, animation: SVGAnimationObject): void {
         addSVGProperties(animation.element, {
@@ -186,6 +187,7 @@ export abstract class IsometricGraphicAbstract extends IsometricElementAbstract 
         });
 
         this.updateSubClassAnimations();
+        if (this.updateAnimations2) this.updateAnimations2();
 
     }
 

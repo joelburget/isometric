@@ -195,4 +195,6 @@ export class IsometricCircle extends IsometricShapeAbstract {
         return super.addAnimation(animation);
     }
 
+    protected updateAnimations2(): void { }
+
 }

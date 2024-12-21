@@ -168,5 +168,6 @@ export class IsometricPath extends IsometricPathAbstract {
     public addAnimation(animation: SVGPathAnimation): this {
         return super.addAnimation(animation);
     }
+    protected updateAnimations2(): void { }
 
 }

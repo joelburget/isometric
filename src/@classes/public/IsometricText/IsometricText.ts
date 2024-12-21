@@ -408,5 +408,6 @@ export class IsometricText extends IsometricGraphicAbstract {
             this.update();
         }
     }
+    protected updateAnimations2(): void { }
 
 }

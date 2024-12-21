@@ -1,31 +1,30 @@
-import {
-    Command,
-    PlaneView,
-    SVG_ELEMENTS,
-    SVG_NAMESPACE,
-} from '@constants';
+import { Command, PlaneView, SVG_ELEMENTS, SVG_NAMESPACE } from '@constants';
 import {
     LinePoint,
     CommandPoint,
     SVGPositionableProperties,
     SVGRectangleProperties,
     SVGRectangleAnimation,
-    SVGAnimationObject
+    SVGAnimationObject,
 } from '@types';
 import {
     getSVGPath,
     translateCommandPoints,
     addSVGProperties,
-    isSVGProperty
+    isSVGProperty,
 } from '@utils/svg';
 import { IsometricShapeAbstract } from '@classes/abstract/IsometricShapeAbstract';
-import {
-    IsometricRectangleProps,
-    GetRectanglePathArguments
-} from './types';
+import { IsometricRectangleProps, GetRectanglePathArguments } from './types';
+
+type dimensions = {
+    height: number;
+    width: number;
+    top: number;
+    left: number;
+    right: number;
+};
 
 export class IsometricRectangle extends IsometricShapeAbstract {
-
     public constructor(props: IsometricRectangleProps) {
         const { height, width, ...rest } = props;
         // Exclude the next line from the coverage reports
@@ -38,6 +37,10 @@ export class IsometricRectangle extends IsometricShapeAbstract {
 
     private _width: number;
     private _height: number;
+    private _animInfo: {
+        dims: dimensions[];
+        duration: number;
+    };
 
     protected getCommands(args?: GetRectanglePathArguments): CommandPoint[] {
         const right = args?.right ?? this.right;
@@ -45,27 +48,29 @@ export class IsometricRectangle extends IsometricShapeAbstract {
         const top = args?.top ?? this.top;
         const width = args?.width ?? this.width;
         const height = args?.height ?? this.height;
-        const commands: LinePoint[] = [ {command: Command.move, point: {r: 0, l: 0, t: 0}} ];
-        switch(this.planeView) {
+        const commands: LinePoint[] = [
+            { command: Command.move, point: { r: 0, l: 0, t: 0 } },
+        ];
+        switch (this.planeView) {
             case PlaneView.FRONT:
                 commands.push(
-                    {command: Command.line, point: {r: 0, l: width, t: 0}},
-                    {command: Command.line, point: {r: 0, l: width, t: height}},
-                    {command: Command.line, point: {r: 0, l: 0, t: height}}
+                    { command: Command.line, point: { r: 0, l: width, t: 0 } },
+                    { command: Command.line, point: { r: 0, l: width, t: height } },
+                    { command: Command.line, point: { r: 0, l: 0, t: height } },
                 );
                 break;
             case PlaneView.SIDE:
                 commands.push(
-                    {command: Command.line, point: {r: width, l: 0, t: 0}},
-                    {command: Command.line, point: {r: width, l: 0, t: height}},
-                    {command: Command.line, point: {r: 0, l: 0, t: height}}
+                    { command: Command.line, point: { r: width, l: 0, t: 0 } },
+                    { command: Command.line, point: { r: width, l: 0, t: height } },
+                    { command: Command.line, point: { r: 0, l: 0, t: height } },
                 );
                 break;
             case PlaneView.TOP:
                 commands.push(
-                    {command: Command.line, point: {r: width, l: 0, t: 0}},
-                    {command: Command.line, point: {r: width, l: height, t: 0}},
-                    {command: Command.line, point: {r: 0, l: height, t: 0}}
+                    { command: Command.line, point: { r: width, l: 0, t: 0 } },
+                    { command: Command.line, point: { r: width, l: height, t: 0 } },
+                    { command: Command.line, point: { r: 0, l: height, t: 0 } },
                 );
                 break;
         }
@@ -80,49 +85,49 @@ export class IsometricRectangle extends IsometricShapeAbstract {
             this.data.centerX,
             this.data.centerY,
             this.data.scale,
-            true
+            true,
         );
     }
 
     protected updateSubClassAnimations(): void {
+        debugger;
 
         this.animations.forEach((animation: SVGAnimationObject): void => {
-
             const isNativeSVGProperty = isSVGProperty(animation.property);
 
             if (!isNativeSVGProperty) {
-
                 const props = {
                     right: this.right,
                     left: this.left,
                     top: this.top,
                     width: this.width,
-                    height: this.height
+                    height: this.height,
                 };
 
                 if (Object.prototype.hasOwnProperty.call(props, animation.property)) {
-
-                    const property = animation.property as SVGPositionableProperties | SVGRectangleProperties;
+                    const property = animation.property as
+                        | SVGPositionableProperties
+                        | SVGRectangleProperties;
                     let properties: Record<string, string>;
 
                     if (animation.values) {
-
                         if (Array.isArray(animation.values)) {
                             properties = {
-                                values: animation.values.map((value: string | number): string => {
-                                    const modifiedArgs = { ...props };
-                                    modifiedArgs[property] = +value;
-                                    return this.getRectanglePath(modifiedArgs);
-                                }).join(';')
+                                values: animation.values
+                                    .map((value: string | number): string => {
+                                        const modifiedArgs = { ...props };
+                                        modifiedArgs[property] = +value;
+                                        return this.getRectanglePath(modifiedArgs);
+                                    })
+                                    .join(';'),
                             };
                         } else {
                             const modifiedArgs = { ...props };
                             modifiedArgs[property] = +animation.values;
                             properties = {
-                                values: this.getRectanglePath(modifiedArgs)
+                                values: this.getRectanglePath(modifiedArgs),
                             };
                         }
-
                     } else {
                         const fromArgs = { ...props };
                         const toArgs = { ...props };
@@ -130,12 +135,15 @@ export class IsometricRectangle extends IsometricShapeAbstract {
                         toArgs[property] = +animation.to;
                         properties = {
                             from: this.getRectanglePath(fromArgs),
-                            to: this.getRectanglePath(toArgs)
+                            to: this.getRectanglePath(toArgs),
                         };
                     }
 
                     if (!animation.element) {
-                        animation.element = document.createElementNS(SVG_NAMESPACE, SVG_ELEMENTS.animate) as SVGAnimateElement;
+                        animation.element = document.createElementNS(
+                            SVG_NAMESPACE,
+                            SVG_ELEMENTS.animate,
+                        ) as SVGAnimateElement;
                     }
 
                     if (!animation.element.parentNode) {
@@ -145,13 +153,9 @@ export class IsometricRectangle extends IsometricShapeAbstract {
                     this.addAnimationBasicProperties('d', animation);
 
                     addSVGProperties(animation.element, properties);
-
                 }
-
             }
-
         });
-
     }
 
     public get width(): number {
@@ -176,4 +180,31 @@ export class IsometricRectangle extends IsometricShapeAbstract {
         return super.addAnimation(animation);
     }
 
+    public animateDimensions(dims: dimensions[], duration: number = 1): this {
+        this._animInfo = { dims, duration };
+        return this;
+    }
+
+    protected updateAnimations2(): void {
+        const { dims, duration } = this._animInfo;
+
+        const element: SVGAnimateElement = document.createElementNS(
+            SVG_NAMESPACE,
+            SVG_ELEMENTS.animate,
+        ) as SVGAnimateElement;
+        this.element.appendChild(element);
+
+        const props = {
+            repeatCount: 'indefinite',
+            attributeName: 'd',
+            dur: `${duration}s`,
+            values: dims
+                .map((dim: dimensions): string => {
+                    return this.getRectanglePath(dim);
+                })
+                .join(';'),
+        };
+        console.log('updateAnimations2', props);
+        addSVGProperties(element, props);
+    }
 }

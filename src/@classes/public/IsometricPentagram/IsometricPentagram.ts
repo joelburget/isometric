@@ -13,5 +13,6 @@ export class IsometricPentagram extends IsometricStarPolygonAbstract {
             density: 2
         });
     }
+    protected updateAnimations2(): void { }
 
 }

@@ -29,5 +29,6 @@ export class IsometricStarPolygon extends IsometricStarPolygonAbstract {
         this._density = value;
         this.update();
     }
+    protected updateAnimations2(): void { }
 
 }
