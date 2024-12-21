@@ -59,15 +59,20 @@ export const getOrientation = (p1: IsometricPoint, p2: IsometricPoint, p3: Isome
     return value >= 0 ? 0 : 1;
 };
 
+const theta = 0.3;
+
 export const getPointFromIsometricPoint = (
     centerX: number,
     centerY: number,
     point: Point,
     scale: number
 ): IsometricPoint => {
+    const rotatedR = point.r * Math.cos(theta) - point.l * Math.sin(theta);
+    const rotatedL = point.r * Math.sin(theta) + point.l * Math.cos(theta);
+
     return {
-        x: round(centerX + (point.r - point.l) * scale * HSQRT3, DECIMALS),
-        y: round(centerY + ((point.r + point.l) / 2 - point.t) * scale, DECIMALS)
+        x: round(centerX + (rotatedR - rotatedL) * scale * HSQRT3, DECIMALS),
+        y: round(centerY + ((rotatedR + rotatedL) / 2 - point.t) * scale, DECIMALS)
     };
 };
 
