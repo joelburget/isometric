@@ -205,7 +205,7 @@ export class IsometricRectangle extends IsometricShapeAbstract {
                 })
                 .join(';'),
         };
-        console.log('updateAnimations2', props);
+        // console.log('updateAnimations2', props);
         addSVGProperties(element, props);
     }
 }
